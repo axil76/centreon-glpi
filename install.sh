@@ -43,6 +43,8 @@ TEST_MACRO_FILE="www/modules/centreon-glpi/core/api_configuration/test.php"
 NAME="centreon-glpi"
 VERSION="1.0"
 MODULE=$NAME.$VERSION
+CRON_NAME="centreon-glpi"
+CROND="/etc/cron.d"
 LOG_VERSION="$MODULE installation"
 FILE_CONF="instCentWeb.conf"
 CENTREON_CONF="/etc/centreon/"
@@ -130,9 +132,38 @@ function get_centreon_configuration_location() {
 }
 
 #---
+## {Install Centreon GLPI cron}
+##
+## @Stderr Log into $LOG_FILE
+#----
+function install_cron() {
+        echo ""
+        echo "$line"
+        echo -e "\tInstalling Centreon GLPI Cron"
+        echo "$line"
+
+        TEMP_D="/tmp/Install_Centreon_GLPI_Cron"
+
+        /bin/mkdir $TEMP_D >> $LOG_FILE 2>> $LOG_FILE        
+
+        if [ -f /etc/cron.d/$CRON_NAME ] ; then
+                echo_success "Deleting old Centreon GLPI cron" "$ok"
+                /bin/rm -Rf "/etc/cron.d/$CRON_NAME"
+        fi
+
+        echo_success "Generating new Centreon GLPI cron" "$ok"
+        echo "* * * * * $NAGIOS_USER $INSTALL_DIR_CENTREON/cron/glpi-import >> $LOG_DIR_CENTREON/centreon-glpi.log 2>&1" >> $TEMP_D/$CRON_NAME
+
+        echo_success "Copying cron" "$ok"
+        /bin/cp -Rf --preserve $TEMP_D/$CRON_NAME $CROND/$CRON_NAME >> $LOG_FILE 2>> $LOG_FILE
+
+        echo_success "Delete temp install directory" "$ok"
+        /bin/rm -Rf $TEMP_D >> $LOG_FILE 2>> $LOG_FILE
+}
+
+#---
 ## {Install Centreon GLPI Module}
 ##
-## @Stdout Actions realised by function
 ## @Stderr Log into $LOG_FILE
 #----
 function install_module() {
@@ -334,7 +365,8 @@ if [ "$silent_install" -eq 0 ] ; then
 	load_parameters=$?
 	
 	if [ "$load_parameters" -eq 1 ] ; then
-		install_module;
+            install_cron;
+            install_module;
 	else
 		echo -e "\nUnable to load all parameters in \"$FILE_CONF\""
 		exit 1
