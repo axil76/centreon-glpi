@@ -84,6 +84,8 @@ function get_centreon_parameters() {
 	LOG_DIR_CENTREON=`cat $CENTREON_CONF/$FILE_CONF | grep "CENTREON_LOG" | cut -d '=' -f2`;
 	WEB_USER=`cat $CENTREON_CONF/$FILE_CONF | grep "WEB_USER" | cut -d '=' -f2`;
 	WEB_GROUP=`cat $CENTREON_CONF/$FILE_CONF | grep "WEB_GROUP" | cut -d '=' -f2`;
+	NAGIOS_USER=`cat $CENTREON_CONF/$FILE_CONF | grep "NAGIOS_USER" | cut -d '=' -f2`;
+        NAGIOS_GROUP=`cat $CENTREON_CONF/$FILE_CONF | grep "NAGIOS_GROUP" | cut -d '=' -f2`;
 	NAGIOS_PLUGIN=`cat $CENTREON_CONF/$FILE_CONF | grep "NAGIOS_PLUGIN" | cut -d '=' -f2`;
 	NAGIOS_VAR=`cat $CENTREON_CONF/$FILE_CONF | grep "NAGIOS_VAR" | cut -d '=' -f2`;
 	CENTREON_VARLIB=`cat $CENTREON_CONF/$FILE_CONF | grep "CENTREON_VARLIB" | cut -d '=' -f2 | sed -e 's|\s||g'`;
@@ -183,7 +185,12 @@ function install_module() {
 	fi
 
 	chmod +x $TEMP_D/plugin/glpi-ticket >> $LOG_FILE 2>> $LOG_FILE
-	dos2unix $TEMP_D/plugin/glpi-ticket >> $LOG_FILE 2>> $LOG_FILE
+	dos2unix $TEMP_D/plugin/glpi-ticket >> $LOG_FILE 2>> $LOG_FILE        
+        chown $NAGIOS_USER.$NAGIOS_GROUP $TEMP_D/plugin/glpi-ticket
+
+        chmod +x $TEMP_D/cron/glpi-import >> $LOG_FILE 2>> $LOG_FILE        
+        dos2unix $TEMP_D/cron/glpi-import >> $LOG_FILE 2>> $LOG_FILE
+        chown $NAGIOS_USER.$NAGIOS_GROUP $TEMP_D/cron/glpi-import
 
 	echo_success "Copying module" "$ok"
         /bin/cp -Rf --preserve $TEMP_D/www/* $INSTALL_DIR_CENTREON/www >> $LOG_FILE 2>> $LOG_FILE
@@ -193,6 +200,7 @@ function install_module() {
 
         echo_success "Copying plugin" "$ok"
         /bin/mkdir -p $NAGIOS_PLUGIN/glpi
+        chown -R $WEB_USER.$WEB_GROUP $NAGIOS_PLUGIN/glpi
         /bin/cp -Rf --preserve $TEMP_D/plugin/* $NAGIOS_PLUGIN/ >> $LOG_FILE 2>> $LOG_FILE
 
 	echo_success "Delete temp install directory" "$ok"
