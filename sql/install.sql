@@ -9,8 +9,8 @@ CREATE TABLE `mod_glpi_api` (
 `clapi_restart` BOOL DEFAULT '0',
 ) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-CREATE TABLE `mod_glpi_rules` (`
-rule_id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+CREATE TABLE `mod_glpi_rules` (
+`rule_id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
 `rule_name` VARCHAR( 255 ) NOT NULL ,
 `rule_description` TEXT NOT NULL ,
 `host_template_id` INT( 11 ) NOT NULL ,
