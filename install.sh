@@ -36,7 +36,7 @@
 # 
 
 # List of files containing macros
-MACRO_FILES="www/modules/centreon-glpi/core/class/centreon.Config.Poller.class.php"
+MACRO_FILES="cron/import.php www/modules/centreon-glpi/core/api_configuration/test.php"
 
 # Define Centreon GLPI version
 NAME="centreon-glpi"

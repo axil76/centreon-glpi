@@ -36,8 +36,7 @@
  *
  */
 
-//require_once "@CENTREON_ETC@/centreon.conf.php";
-require_once "/etc/centreon/centreon.conf.php";
+require_once "@CENTREON_ETC@/centreon.conf.php";
 chdir($centreon_path."www/");
 require_once $centreon_path."www/modules/centreon-glpi/core/class/Centreon/Glpi/Client.php";
 require_once $centreon_path."www/class/centreonDB.class.php";
