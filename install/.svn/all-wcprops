@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/centreon-clapi/!svn/ver/204/trunk/install
+END
+cinstall
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/centreon-clapi/!svn/ver/174/trunk/install/cinstall
+END
+functions
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/centreon-clapi/!svn/ver/204/trunk/install/functions
+END
+vars
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/centreon-clapi/!svn/ver/174/trunk/install/vars
+END
