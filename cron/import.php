@@ -1,0 +1,201 @@
+<?php
+/*
+ * Copyright 2005-2012 MERETHIS
+ * Centreon is developped by : Julien Mathis and Romain Le Merlus under
+ * GPL Licence 2.0.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation ; either version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses>.
+ *
+ * Linking this program statically or dynamically with other modules is making a
+ * combined work based on this program. Thus, the terms and conditions of the GNU
+ * General Public License cover the whole combination.
+ *
+ * As a special exception, the copyright holders of this program give MERETHIS
+ * permission to link this program with independent modules to produce an executable,
+ * regardless of the license terms of these independent modules, and to copy and
+ * distribute the resulting executable under terms of MERETHIS choice, provided that
+ * MERETHIS also meet, for each linked independent module, the terms  and conditions
+ * of the license of that module. An independent module is a module which is not
+ * derived from this program. If you modify this program, you may extend this
+ * exception to your version of the program, but you are not obliged to do so. If you
+ * do not wish to do so, delete this exception statement from your version.
+ *
+ * For more information : contact@centreon.com
+ *
+ * SVN : $URL$
+ * SVN : $Id$
+ *
+ */
+
+require_once "/etc/centreon/centreon.conf.php";
+
+/**
+ * Output
+ * 
+ * @param string $message
+ * @return void 
+ */
+function output($message)
+{
+    echo "[".date("d-m-Y H:i:s")."] ".$message."\n";
+}
+
+chdir($centreon_path."www/");
+
+require_once $centreon_path."www/class/centreonDB.class.php";
+require_once $centreon_path."www/modules/centreon-glpi/core/class/Centreon/Glpi/Client.php";
+require_once $centreon_path."www/modules/centreon-glpi/core/class/Centreon/Glpi/Rule.php";
+require_once $centreon_path."www/modules/centreon-glpi/core/class/Centreon/Glpi/Api.php";
+
+try {
+    $db = new CentreonDB();
+    $ruleObj = new Centreon_Glpi_Rule($db);
+    $apiParams = Centreon_Glpi_Api::getParams($db);
+    $glpiClient = new Centreon_Glpi_Client(null, $apiParams);    
+    $clapiCommandPrefix = $centreon_path."/www/modules/centreon-clapi/core/centreon -u ".$apiParams['clapi_login']." -p ".$apiParams['clapi_pass'];
+    exec($clapiCommandPrefix, $output, $clapiRes);
+    if ($clapiRes == 1) {
+        throw new Exception('Centreon CLAPI authentication failure');
+    }
+    
+    /**
+     * Instances
+     */
+    $res = $db->query("SELECT id, name FROM nagios_server");
+    $instances = array();
+    while ($row = $res->fetchRow()) {
+        $instances[$row['id']] = $row['name'];
+    }
+    
+    /**
+     * Host groups 
+     */
+    $res = $db->query("SELECT hg_id, hg_name FROM hostgroup");
+    $hostgroups = array();
+    while ($row = $res->fetchRow()) {
+        $hostgroups[$row['hg_id']] = $row['hg_name'];
+    }
+    
+    /**
+     * Host categories
+     */
+    $res = $db->query("SELECT hc_id, hc_name FROM hostcategories");
+    $hostcategories = array();
+    while ($row = $res->fetchRow()) {
+        $hostcategories[$row['hc_id']] = $row['hc_name'];
+    }
+    
+    /**
+     * Centreon host names and host templates
+     */
+    $sql = "SELECT host_id, host_name, host_address, host_register FROM host";
+    $res = $db->query($sql);
+    $centreonHosts = array();
+    $hostTemplates = array();
+    while ($row = $res->fetchRow()) {
+        if ($row['host_register'] == 1) {
+            $centreonHosts[$row['host_name']] = $row['host_address'];
+        } elseif ($row['host_register'] == 0) {
+            $hostTemplates[$row['host_id']] = $row['host_name'];
+        }
+    }
+    
+    /**
+     * Rules 
+     */
+    $sql = "SELECT r.rule_id, r.rule_name
+            FROM mod_glpi_matching m, mod_glpi_rules r
+            WHERE m.rule_id = r.rule_id 
+            AND m.rule_dropdown_value != ''
+            GROUP BY rule_id
+            ORDER BY COUNT(r.rule_id) DESC";
+    $res = $db->query($sql);
+    $rules = array();
+    while ($row = $res->fetchRow()) {
+        $rules[$row['rule_id']] = $row['rule_name'];
+    }
+    $pollersToRestart = array();
+    foreach ($rules as $ruleId => $ruleName) {        
+        $ruleInfo = $ruleObj->getSettings($ruleId);
+        $hgs = array();
+        foreach ($ruleInfo['hostgroups'] as $hgId) {
+            $hgs[] = $hostgroups[$hgId];
+        }
+        $hcs = array();
+        foreach ($ruleInfo['hostcategories'] as $hcId) {
+            $hcs[] = $hostcategories[$hcId];
+        }
+        $sql = "SELECT rule_dropdown_name, rule_dropdown_value 
+                FROM mod_glpi_matching
+                WHERE rule_id = ".$db->escape($ruleId)."
+                AND rule_dropdown_value != ''";
+        $res = $db->query($sql);
+        $filters = array('itemtype'=>'NetworkEquipment');
+        while ($row = $res->fetchRow()) {
+            $filters[$row['rule_dropdown_name']] = preg_replace('/\*/', '%', $row['rule_dropdown_value']);
+        }
+        $matchedResult = $glpiClient->listObjects($filters);
+        foreach ($matchedResult as $result) {
+            $hostInfo = $glpiClient->getNetworkEquipment(array('id' => $result['id']));                
+            $address = $hostInfo['ip'];
+            if (!isset($centreonHosts[$result['name']])) {                
+                $clapiCommand = $clapiCommandPrefix." -o HOST -a ADD -v \"".$result['name'].";".$result['name'].";".$address.";".$hostTemplates[$ruleInfo['host_template_id']].";".$instances[$ruleInfo['instance_id']].";".implode("|", $hgs)."\"";
+                exec($clapiCommand);
+                exec($clapiCommandPrefix." -o HOST -a APPLYTPL -v ".$result['name']);
+                if (count($hcs)) {
+                    foreach ($hcs as $hcName) {
+                        $clapiCommand = $clapiCommandPrefix." -o HC -a addmember -v \"".$hcName.";".$result['name']."\"";
+                        exec($clapiCommand);
+                    }
+                }
+                $centreonHosts[$result['name']] = $address;
+                output("Added ".$result['name']." - (Rule: ".$ruleName.")");
+                $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
+            } elseif ($centreonHosts[$result['name']] != $address) {
+                $clapiCommand = $clapiCommandPrefix." -o HOST -a SETPARAM -v \"".$result['name'].";address;".$address."\"";
+                exec($clapiCommand);
+                output("Updated IP address of ".$result['name']);
+            }
+        }
+    }
+    if ($apiParams['clapi_restart'] == 1 && count($pollersToRestart)) {
+        foreach ($pollersToRestart as $pollerId => $pollerName) {
+            exec($clapiCommandPrefix." -a POLLERGENERATE -v $pollerId", $output, $returnVal);
+            if ($returnVal == 0) {
+                output("Generated files for poller ".$pollerName);
+                exec($clapiCommandPrefix." -a POLLERTEST -v $pollerId", $output, $returnVal);
+                if ($returnVal == 0) {
+                    output("Configuration file checking successful for poller ".$pollerName);
+                    exec($clapiCommandPrefix." -a CFGMOVE -v $pollerId", $output, $returnVal);
+                    if ($returnVal == 0) {
+                        output("Successfully moved configuration files to poller ".$pollerName);
+                        exec($clapiCommandPrefix." -a POLLERRESTART -v $pollerId", $output, $returnVal);
+                        if ($returnVal == 0) {
+                            output("Poller ".$pollerName." successfully restarted");
+                        } else {
+                            output("Could not restart poller ".$pollerName);
+                        }
+                    } else {
+                        output("Could not copy configuration files to poller ".$pollerName);
+                    }
+                } else {
+                    output("Engine configuration file checking was not successful for poller ".$pollerName);
+                }
+            } else {
+                output("Could not generate files for poller ".$pollerName);
+            }
+        }
+    }
+} catch (Exception $e) {
+    output($e->getMessage());
+}
+?>
