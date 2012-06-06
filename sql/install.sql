@@ -6,7 +6,7 @@ CREATE TABLE `mod_glpi_api` (
 `api_pass` VARCHAR( 255 ) NOT NULL,
 `clapi_login` VARCHAR( 255 ) NOT NULL,
 `clapi_pass` VARCHAR( 255 ) NOT NULL,
-`clapi_restart` BOOL DEFAULT '0',
+`clapi_restart` BOOL DEFAULT '0'
 ) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE `mod_glpi_rules` (
