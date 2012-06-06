@@ -140,9 +140,13 @@ function install_module() {
 	
 	TEMP_D="/tmp/installation-glpi"
 	/bin/mkdir $TEMP_D >> $LOG_FILE 2>> $LOG_FILE
-    /bin/mkdir $TEMP_D/www >> $LOG_FILE 2>> $LOG_FILE
+        /bin/mkdir $TEMP_D/www >> $LOG_FILE 2>> $LOG_FILE
+        /bin/mkdir $TEMP_D/plugin >> $LOG_FILE 2>> $LOG_FILE
+        /bin/mkdir $TEMP_D/cron >> $LOG_FILE 2>> $LOG_FILE
 
-    /bin/cp -Rf www/* $TEMP_D/www >> $LOG_FILE 2>> $LOG_FILE
+        /bin/cp -Rf www/* $TEMP_D/www >> $LOG_FILE 2>> $LOG_FILE
+        /bin/cp -Rf plugin/* $TEMP_D/plugin >> $LOG_FILE 2>> $LOG_FILE
+        /bin/cp -Rf cron/* $TEMP_D/cron >> $LOG_FILE 2>> $LOG_FILE
 	/bin/rm -Rf $TEMP_D/install $TEMP_D/*.log
 
 	echo_success "Replacing macros" "$ok"
@@ -158,7 +162,7 @@ function install_module() {
 
 	if [ -d $INSTALL_DIR_MODULE ] ; then
 		if [ -d  $INSTALL_DIR_CENTREON/$BACKUP ] ; then
-			echo_success "Delete old Centreon CLAPI backup" "$ok"
+			echo_success "Delete old Centreon GLPI backup" "$ok"
 			/bin/rm -Rf $INSTALL_DIR_CENTREON/$BACKUP/*
 		else
 			echo_success "Create a directory to backup old files" "$ok"
@@ -176,11 +180,18 @@ function install_module() {
 		/bin/chmod -R 755 $INSTALL_DIR_MODULE >> $LOG_FILE 2>> $LOG_FILE	
 	fi
 
-	chmod +x $TEMP_D/www/modules/centreon-glpi/core/centreon >> $LOG_FILE 2>> $LOG_FILE
-	dos2unix $TEMP_D/www/modules/centreon-glpi/core/centreon >> $LOG_FILE 2>> $LOG_FILE
+	chmod +x $TEMP_D/plugin/glpi-ticket >> $LOG_FILE 2>> $LOG_FILE
+	dos2unix $TEMP_D/plugin/glpi-ticket >> $LOG_FILE 2>> $LOG_FILE
 
 	echo_success "Copying module" "$ok"
         /bin/cp -Rf --preserve $TEMP_D/www/* $INSTALL_DIR_CENTREON/www >> $LOG_FILE 2>> $LOG_FILE
+
+        echo_success "Copying cron" "$ok"
+        /bin/cp -Rf --preserve $TEMP_D/cron/* $INSTALL_DIR_CENTREON/cron/ >> $LOG_FILE 2>> $LOG_FILE
+
+        echo_success "Copying plugin" "$ok"
+        /bin/mkdir -p $NAGIOS_PLUGIN/glpi
+        /bin/cp -Rf --preserve $TEMP_D/plugin/* $NAGIOS_PLUGIN/ >> $LOG_FILE 2>> $LOG_FILE
 
 	echo_success "Delete temp install directory" "$ok"
 	/bin/rm -Rf $TEMP_D $TEMP >> $LOG_FILE 2>> $LOG_FILE
@@ -271,7 +282,7 @@ define_specific_binary_vars
 ${CAT} << __EOT__
 ###############################################################################
 #                                                                             #
-#              Module : Centreon CLAPI version $VERSION                    #
+#              Module : Centreon GLPI version $VERSION                    #
 #                                                                             #
 ###############################################################################
 __EOT__
