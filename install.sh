@@ -180,7 +180,7 @@ function install_module() {
 
         /bin/cp -Rf www/* $TEMP_D/www >> $LOG_FILE 2>> $LOG_FILE
         /bin/cp -Rf plugin/* $TEMP_D/plugin >> $LOG_FILE 2>> $LOG_FILE
-        /bin/cp -Rf cron/* $TEMP_D/cron >> $LOG_FILE 2>> $LOG_FILE
+        /bin/cp -Rf cron/glpi-import $TEMP_D/cron >> $LOG_FILE 2>> $LOG_FILE
 	/bin/rm -Rf $TEMP_D/install $TEMP_D/*.log
 
 	echo_success "Replacing macros" "$ok"
