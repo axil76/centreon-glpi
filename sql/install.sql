@@ -60,4 +60,4 @@ INSERT INTO `mod_glpi_api` (`glpi_url`, `api_user`, `api_pass`, `admin_login`, `
 
 INSERT INTO `command` (`command_name`, `command_line`, `command_type`) VALUES 
     ('glpi-ticket-host', '@NAGIOS_PLUGIN@/glpi-ticket -c @NAGIOS_PLUGIN@/glpi/webservices.ini -t $HOSTSTATETYPE$ -s $HOSTSTATE$ -o "$HOSTOUTPUT$" -h "$HOSTNAME$"', '2'),
-    ('glpi-ticket-service', '@NAGIOS_PLUGIN@/glpi-ticket -c @NAGIOS_PLUGIN@/glpi/webservices.ini -t $SERVICESTATETYPE$ -s $SERVICESTATE$ -o "$SERVICEOUTPUT$" -h "$HOSTNAME$" -e "$SERVICEDESC$"', '2');
+    ('glpi-ticket-service', '@NAGIOS_PLUGIN@/glpi-ticket -c @NAGIOS_PLUGIN@/glpi/webservices.ini -t $SERVICESTATETYPE$ -s $SERVICESTATE$ -o "$SERVICEOUTPUT$" -a $HOSTSTATE$ -h "$HOSTNAME$" -e "$SERVICEDESC$"', '2');

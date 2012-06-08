@@ -120,13 +120,18 @@ try {
     }
     if ($args['t'] == "HARD") {
         $params = parse_ini_file($args['c']);
-        $glpiClient = new Centreon_Glpi_Client($params);                
-        if ($args['s'] != "UP" && $args['s'] != "OK") {
-            if (isset($args['e']) && $args['e']) {
-                $title = "Service ".$args['e']." of ".$args['h']." is ".$args['s'];
-            } else {
-                $title = "Host ".$args['h']." is ".$args['s'];
-            }
+        $glpiClient = new Centreon_Glpi_Client($params);
+        $openTicket = false;
+        if ($args['s'] == "DOWN") {            
+            $title = "Host ".$args['h']." is ".$args['s'];            
+            $openTicket = true;
+        } elseif (($args['s'] == "CRITICAL" || 
+                  $args['s'] == "WARNING" ||
+                  $args['s'] == "UNKNOWN") && $args['a'] != "DOWN" && $args['a'] != "UNREACHABLE") {
+            $title = "Service ".$args['e']." of ".$args['h']." is ".$args['s'];
+            $openTicket = true;
+        }
+        if ($openTicket == true) {
             $content = $args['o'];
             $list = $glpiClient->listObjects(array('itemtype' => 'NetworkEquipment',
                                                    'name'     => $args['h']));
