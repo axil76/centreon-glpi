@@ -114,20 +114,18 @@ class Centreon_Glpi_Client {
 }
 
 try {
-    $args = getopt("c:t:s:o:h:e:i:");
+    $args = getopt("c:t:s:o:h:e:");
     if (!isset($args['c']) || !is_file($args['c'])) {
         throw new Exception('Configuration file not found');
     }
     if ($args['t'] == "HARD") {
         $params = parse_ini_file($args['c']);
-        $glpiClient = new Centreon_Glpi_Client($params);
-        $problemId = "[".$args['i']."]";
-        $ticket = $glpiClient->listTickets(array('title' => $problemId."%"));
-        if ($args['s'] != "UP" && $args['s'] != "OK" && !isset($ticket[0])) {
+        $glpiClient = new Centreon_Glpi_Client($params);                
+        if ($args['s'] != "UP" && $args['s'] != "OK") {
             if (isset($args['e']) && $args['e']) {
-                $title = $problemId." Service ".$args['e']." of ".$args['h']." is ".$args['s'];
+                $title = "Service ".$args['e']." of ".$args['h']." is ".$args['s'];
             } else {
-                $title = $problemId." Host ".$args['h']." is ".$args['s'];
+                $title = "Host ".$args['h']." is ".$args['s'];
             }
             $content = $args['o'];
             $list = $glpiClient->listObjects(array('itemtype' => 'NetworkEquipment',
@@ -140,11 +138,6 @@ try {
                                             'content' => $content,
                                             'itemtype'=> 'NetworkEquipment',
                                             'item'    => $itemId));
-        } else {            
-            if (isset($ticket[0]) && isset($ticket[0]['id'])) {
-                $glpiClient->addTicketFollowup(array('ticket'  => $ticket[0]['id'],
-                                                     'content' => 'RECOVERY'));
-            }
         }
     }
 } catch (Exception $e) {
