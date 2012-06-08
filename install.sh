@@ -38,6 +38,7 @@
 # List of files containing macros
 CRON_MACRO_FILE="cron/glpi-import"
 TEST_MACRO_FILE="www/modules/centreon-glpi/core/api_configuration/test.php"
+SQL_MACRO_FILE="www/modules/centreon-glpi/sql/install.sql"
 
 # Define Centreon GLPI version
 NAME="centreon-glpi"
@@ -186,6 +187,7 @@ function install_module() {
 	echo_success "Replacing macros" "$ok"
 	replace_macro $TEMP_D/$CRON_MACRO_FILE
         replace_macro $TEMP_D/$TEST_MACRO_FILE
+        replace_macro $TEMP_D/$SQL_MACRO_FILE
 
 	echo_success "Setting right" "$ok"
 	chmod -R 755 $TEMP_D/* >> $LOG_FILE 2>> $LOG_FILE
