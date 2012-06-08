@@ -152,7 +152,7 @@ function install_cron() {
         fi
 
         echo_success "Generating new Centreon GLPI cron" "$ok"
-        echo "* * * * * $NAGIOS_USER $INSTALL_DIR_CENTREON/cron/glpi-import >> $LOG_DIR_CENTREON/centreon-glpi.log 2>&1" >> $TEMP_D/$CRON_NAME
+        echo "* * * * * root $INSTALL_DIR_CENTREON/cron/glpi-import >> $LOG_DIR_CENTREON/centreon-glpi.log 2>&1" >> $TEMP_D/$CRON_NAME
 
         echo_success "Copying cron" "$ok"
         /bin/cp -Rf --preserve $TEMP_D/$CRON_NAME $CROND/$CRON_NAME >> $LOG_FILE 2>> $LOG_FILE

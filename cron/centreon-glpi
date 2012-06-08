@@ -1,1 +1,1 @@
-* * * * * nagios @CENTREON_DIR@/cron/glpi-import >> @CENTREON_LOG@/centreon-glpi.log 2>&1
+* * * * * root @CENTREON_DIR@/cron/glpi-import >> @CENTREON_LOG@/centreon-glpi.log 2>&1
