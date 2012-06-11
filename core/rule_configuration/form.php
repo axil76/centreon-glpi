@@ -159,6 +159,8 @@ try {
     $ams1->setElementTemplate($eTemplate);
     echo $ams1->getElementJs(false);
 
+    $form->addElement('text', 'ip_range', _("IP Range"), $attrsText);
+    
     $form->addElement('header', 'rules_header', _("Rules"));
 
     /*

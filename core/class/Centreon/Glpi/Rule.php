@@ -69,7 +69,7 @@ class Centreon_Glpi_Rule {
         if (is_null($offset) && is_null($limit)) {
             $sql = "SELECT COUNT(rule_id) as nb ";
         } else {
-            $sql = "SELECT rule_id, rule_name, rule_description, activate ";
+            $sql = "SELECT rule_id, rule_name, rule_description, ip_range, activate ";
         }
         $sql .= "FROM mod_glpi_rules ";
         if (count($filters)) {
@@ -216,10 +216,11 @@ class Centreon_Glpi_Rule {
      */
     public function insert($params = array())
     {        
-        $sql = "INSERT INTO mod_glpi_rules (rule_name, rule_description, host_template_id, instance_id) 
+        $sql = "INSERT INTO mod_glpi_rules (rule_name, rule_description, host_template_id, ip_range, instance_id) 
                 VALUES ('".$this->db->escape($params['rule_name'])."', 
                         '".$this->db->escape($params['rule_description'])."', 
                         ".$this->db->escape($params['host_template_id']).",
+                        '".$this->db->escape($params['ip_range'])."', 
                         ".$this->db->escape($params['instance_id']).")";
         $this->db->query($sql);
         $sql2 = "SELECT MAX(rule_id) AS last_id
@@ -260,6 +261,7 @@ class Centreon_Glpi_Rule {
                     rule_name = '".$this->db->escape($params['rule_name'])."', 
                     rule_description = '".$this->db->escape($params['rule_description'])."', 
                     host_template_id = ".$this->db->escape($params['host_template_id']).", 
+                    ip_range = '".$this->db->escape($params['ip_range'])."', 
                     instance_id = ".$this->db->escape($params['instance_id'])." 
                 WHERE rule_id = ".$this->db->escape($ruleId);        
         $this->db->query($sql);
@@ -367,7 +369,7 @@ class Centreon_Glpi_Rule {
     public function getSettings($ruleId)
     {
         $settings = array();
-        $sql = "SELECT rule_name, rule_description, host_template_id, instance_id 
+        $sql = "SELECT rule_name, rule_description, host_template_id, ip_range, instance_id 
                 FROM mod_glpi_rules 
                 WHERE rule_id = ".$this->db->escape($ruleId);        
         $res = $this->db->query($sql);

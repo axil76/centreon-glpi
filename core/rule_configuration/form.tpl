@@ -18,6 +18,7 @@
             <tr class="list_two"><td class="FormRowField">{$form.host_template_id.label}</td><td class="FormRowValue">{$form.host_template_id.html}</td></tr>
             <tr class="list_one"><td class="FormRowField">{$form.hostgroups.label}</td><td class="FormRowValue"><p  class="oreonbutton">{$form.hostgroups.html}</p></td></tr>
             <tr class="list_two"><td class="FormRowField">{$form.hostcategories.label}</td><td class="FormRowValue"><p  class="oreonbutton">{$form.hostcategories.html}</p></td></tr>
+            <tr class="list_one"><td class="FormRowField">{$form.ip_range.label}</td><td class="FormRowValue">{$form.ip_range.html}</td></tr>
             <tr class="list_lvl_1"><td class="ListColLvl1_name" colspan="2"><img src='./modules/centreon-glpi/img/glpi.gif'>&nbsp;&nbsp;{$form.header.rules_header}</td></tr>
             <tr class="list_one"><td class="FormRowField">{$form.dropdowns.name.label}</td><td class="FormRowValue">{$form.dropdowns.name.html}</td></tr>
             <tr class="list_two"><td class="FormRowField">{$form.dropdowns.locations_id.label}</td><td class="FormRowValue">{$form.dropdowns.locations_id.html}</td></tr>
@@ -26,8 +27,8 @@
             <tr class="list_one"><td class="FormRowField">{$form.dropdowns.users_id.label}</td><td class="FormRowValue">{$form.dropdowns.users_id.html}</td></tr>
             <tr class="list_two"><td class="FormRowField">{$form.dropdowns.groups_id.label}</td><td class="FormRowValue">{$form.dropdowns.groups_id.html}</td></tr>
             <tr class="list_one"><td class="FormRowField">{$form.dropdowns.networks_id.label}</td><td class="FormRowValue">{$form.dropdowns.networks_id.html}</td></tr>
-            <tr class="list_two"><td class="FormRowField">{$form.dropdowns.networkequipmenttypes_id.label}</td><td class="FormRowValue">{$form.dropdowns.networkequipmenttypes_id.html}</td></tr>
-            <tr class="list_one"><td class="FormRowField">{$form.dropdowns.networkequipmentmodels_id.label}</td><td class="FormRowValue">{$form.dropdowns.networkequipmentmodels_id.html}</td></tr>
+            <!-- <tr class="list_two"><td class="FormRowField">{$form.dropdowns.networkequipmenttypes_id.label}</td><td class="FormRowValue">{$form.dropdowns.networkequipmenttypes_id.html}</td></tr> -->
+            <!-- <tr class="list_one"><td class="FormRowField">{$form.dropdowns.networkequipmentmodels_id.label}</td><td class="FormRowValue">{$form.dropdowns.networkequipmentmodels_id.html}</td></tr> -->
             <tr class="list_two"><td class="FormRowField">{$form.dropdowns.states_id.label}</td><td class="FormRowValue">{$form.dropdowns.states_id.html}</td></tr>
             <tr class="list_one"><td class="FormRowField">{$form.dropdowns.domains_id.label}</td><td class="FormRowValue">{$form.dropdowns.domains_id.html}</td></tr>
             <tr class="list_two"><td class="FormRowField">{$form.dropdowns.manufacturers_id.label}</td><td class="FormRowValue">{$form.dropdowns.manufacturers_id.html}</td></tr>

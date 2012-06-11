@@ -1,0 +1,1 @@
+ALTER TABLE  `mod_glpi_rules` ADD  `ip_range` VARCHAR( 255 ) NOT NULL AFTER  `instance_id` ;

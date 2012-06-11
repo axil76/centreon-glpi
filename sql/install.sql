@@ -15,6 +15,7 @@ CREATE TABLE `mod_glpi_rules` (
 `rule_description` TEXT NOT NULL ,
 `host_template_id` INT( 11 ) NOT NULL ,
 `instance_id` INT( 11 ) NOT NULL ,
+`ip_range` VARCHAR( 255 ) NOT NULL ,
 `activate` BOOL DEFAULT '1',
 PRIMARY KEY (  `rule_id` )
 ) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;
