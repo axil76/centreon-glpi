@@ -201,7 +201,7 @@ try {
         $usergroups[$result['id']] = $result['name'];
     }
     $form->addElement('select', 'dropdowns[groups_id_tech]', _("Group in charge of the hardware"), $usergroups);
-    $form->addElement('select', 'dropdowns[groups_id]', _("User"), $usergroups);
+    $form->addElement('select', 'dropdowns[groups_id]', _("Group"), $usergroups);
 
     /*
      * Domain
