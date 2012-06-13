@@ -173,6 +173,7 @@ try {
                 $clapiCommand = $clapiCommandPrefix." -o HOST -a SETPARAM -v \"".$result['name'].";address;".$address."\"";
                 exec($clapiCommand);
                 output("Updated IP address of ".$result['name']);
+                $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
             }
         }
         
@@ -216,6 +217,7 @@ try {
                 $clapiCommand = $clapiCommandPrefix." -o HOST -a SETPARAM -v \"".$result['name'].";address;".$address."\"";
                 exec($clapiCommand);
                 output("Updated IP address of ".$result['name']);
+                $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
             }
         }
     }
