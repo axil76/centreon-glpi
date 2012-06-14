@@ -138,11 +138,24 @@ try {
             $itemId = null;
             if (isset($list[0]) && isset($list[0]['id'])) {
                 $itemId = $list[0]['id'];
+                $itemType = 'NetworkEquipment';
+            } else {
+                $list = $glpiClient->listObjects(array('itemtype' => 'Computer',
+                                                       'name'     => $args['h']));
+                if (isset($list[0]) && isset($list[0]['id'])) {
+                    $itemId = $list[0]['id'];
+                    $itemType = 'Computer';
+                }
             }
-            $glpiClient->createTicket(array('title'   => $title,
-                                            'content' => $content,
-                                            'itemtype'=> 'NetworkEquipment',
-                                            'item'    => $itemId));
+            if (!is_null($itemId) && isset($itemType)) {
+                $glpiClient->createTicket(array('title'   => $title,
+                                                'content' => $content,
+                                                'itemtype'=> $itemType,
+                                                'item'    => $itemId));
+            } else {
+                $glpiClient->createTicket(array('title'   => $title,
+                                                'content' => $content));
+            }
         }
     }
 } catch (Exception $e) {
