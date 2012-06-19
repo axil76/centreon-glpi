@@ -223,7 +223,7 @@ try {
     foreach ($resultSet as $result) {
         $networks[$result['id']] = $result['name'];
     }
-    $form->addElement('select', 'dropdowns[networks_id]', _("Network"), $networks);
+    $form->addElement('select', 'dropdowns[network_id]', _("Network"), $networks);
 
     /*
      * Network equipment types

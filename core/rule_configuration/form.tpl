@@ -26,7 +26,7 @@
             <tr class="list_two"><td class="FormRowField">{$form.dropdowns.groups_id_tech.label}</td><td class="FormRowValue">{$form.dropdowns.groups_id_tech.html}</td></tr>
             <tr class="list_one"><td class="FormRowField">{$form.dropdowns.users_id.label}</td><td class="FormRowValue">{$form.dropdowns.users_id.html}</td></tr>
             <tr class="list_two"><td class="FormRowField">{$form.dropdowns.groups_id.label}</td><td class="FormRowValue">{$form.dropdowns.groups_id.html}</td></tr>
-            <tr class="list_one"><td class="FormRowField">{$form.dropdowns.networks_id.label}</td><td class="FormRowValue">{$form.dropdowns.networks_id.html}</td></tr>
+            <tr class="list_one"><td class="FormRowField">{$form.dropdowns.network_id.label}</td><td class="FormRowValue">{$form.dropdowns.network_id.html}</td></tr>
             <!-- <tr class="list_two"><td class="FormRowField">{$form.dropdowns.networkequipmenttypes_id.label}</td><td class="FormRowValue">{$form.dropdowns.networkequipmenttypes_id.html}</td></tr> -->
             <!-- <tr class="list_one"><td class="FormRowField">{$form.dropdowns.networkequipmentmodels_id.label}</td><td class="FormRowValue">{$form.dropdowns.networkequipmentmodels_id.html}</td></tr> -->
             <tr class="list_two"><td class="FormRowField">{$form.dropdowns.states_id.label}</td><td class="FormRowValue">{$form.dropdowns.states_id.html}</td></tr>
