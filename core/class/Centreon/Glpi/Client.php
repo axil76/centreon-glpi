@@ -36,7 +36,11 @@
  *
  */
 
-require_once './modules/centreon-glpi/core/class/Centreon/Glpi/Api.php';
+if (file_exists('./modules/centreon-glpi/core/class/Centreon/Glpi/Api.php')) {
+    require_once './modules/centreon-glpi/core/class/Centreon/Glpi/Api.php';
+} else {
+    require_once $centreon_path .'www/modules/centreon-glpi/core/class/Centreon/Glpi/Api.php';
+}
 
 /**
  * GLPI Soap Client
