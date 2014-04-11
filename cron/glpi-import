@@ -150,7 +150,7 @@ try {
         /**
          * Network Equipment
          */        
-        $networkFilter = $filters;
+        /*$networkFilter = $filters;
         $networkFilter['itemtype'] = 'NetworkEquipment';
         $matchedResult = $glpiClient->listObjects($networkFilter);
         foreach ($matchedResult as $result) {
@@ -175,49 +175,52 @@ try {
                 output("Updated IP address of ".$result['name']);
                 $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
             }
-        }
+        }*/
         
         /**
          * Computers
          * @todo refactor this 
          */                
-        $computerFilter = $filters;
-        $computerFilter['itemtype'] = 'Computer';
-        $matchedResult = $glpiClient->listObjects($computerFilter);
-        foreach ($matchedResult as $result) {
-            $hostInfo = $glpiClient->getNetworkports(array('id'       => $result['id'],
-                                                           'itemtype' => 'Computer'));
-            $address = "";
-            if (count($hostInfo)) {
-                foreach ($hostInfo as $info) {
-                    if ($info['ip'] != "127.0.0.1") {
-                        if (isset($ipRange) && $ipRange != "" && false == Centreon_Glpi_Utils::ipInRange($info['ip'], $ipRange)) {
-                            continue;
-                        } else {
-                            $address = $info['ip'];
-                            break;
+        $listType = array('Computer', 'NetworkEquipment');
+        foreach ($listType as $itemtype) {
+            $computerFilter = $filters;
+            $computerFilter['itemtype'] = $itemtype;
+            $matchedResult = $glpiClient->listObjects($computerFilter);
+            foreach ($matchedResult as $result) {
+                $hostInfo = $glpiClient->getNetworkports(array('id'       => $result['id'],
+                                                               'itemtype' => $itemtype));
+                $address = "";
+                if (count($hostInfo)) {
+                    foreach ($hostInfo as $info) {
+                        if ($info['ip'] != "127.0.0.1") {
+                            if (isset($ipRange) && $ipRange != "" && false == Centreon_Glpi_Utils::ipInRange($info['ip'], $ipRange)) {
+                                continue;
+                            } else {
+                                $address = $info['ip'];
+                                break;
+                            }
                         }
                     }
-                }
-            }            
-            if (!isset($centreonHosts[$result['name']]) && $address) {                
-                $clapiCommand = $clapiCommandPrefix." -o HOST -a ADD -v \"".$result['name'].";".$result['name'].";".$address.";".$hostTemplates[$ruleInfo['host_template_id']].";".$instances[$ruleInfo['instance_id']].";".implode("|", $hgs)."\"";
-                exec($clapiCommand);
-                exec($clapiCommandPrefix." -o HOST -a APPLYTPL -v ".$result['name']);
-                if (count($hcs)) {
-                    foreach ($hcs as $hcName) {
-                        $clapiCommand = $clapiCommandPrefix." -o HC -a addmember -v \"".$hcName.";".$result['name']."\"";
-                        exec($clapiCommand);
+                }            
+                if (!isset($centreonHosts[$result['name']]) && $address) {                
+                    $clapiCommand = $clapiCommandPrefix." -o HOST -a ADD -v \"".$result['name'].";".$result['name'].";".$address.";".$hostTemplates[$ruleInfo['host_template_id']].";".$instances[$ruleInfo['instance_id']].";".implode("|", $hgs)."\"";
+                    exec($clapiCommand);
+                    exec($clapiCommandPrefix." -o HOST -a APPLYTPL -v ".$result['name']);
+                    if (count($hcs)) {
+                        foreach ($hcs as $hcName) {
+                            $clapiCommand = $clapiCommandPrefix." -o HC -a addmember -v \"".$hcName.";".$result['name']."\"";
+                            exec($clapiCommand);
+                        }
                     }
+                    $centreonHosts[$result['name']] = $address;
+                    output("Added ".$result['name']." - (Rule: ".$ruleName.")");
+                    $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
+                } elseif ($centreonHosts[$result['name']] != $address) {
+                    $clapiCommand = $clapiCommandPrefix." -o HOST -a SETPARAM -v \"".$result['name'].";address;".$address."\"";
+                    exec($clapiCommand);
+                    output("Updated IP address of ".$result['name']);
+                    $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
                 }
-                $centreonHosts[$result['name']] = $address;
-                output("Added ".$result['name']." - (Rule: ".$ruleName.")");
-                $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
-            } elseif ($centreonHosts[$result['name']] != $address) {
-                $clapiCommand = $clapiCommandPrefix." -o HOST -a SETPARAM -v \"".$result['name'].";address;".$address."\"";
-                exec($clapiCommand);
-                output("Updated IP address of ".$result['name']);
-                $pollersToRestart[$ruleInfo['instance_id']] = $instances[$ruleInfo['instance_id']];
             }
         }
     }
